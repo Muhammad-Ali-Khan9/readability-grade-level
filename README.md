@@ -1,37 +1,55 @@
 # Readability Grade Level
 
-A C++ program that estimates the U.S. school grade needed to understand a piece of text using the **Coleman–Liau index**.
+A C++ program that scores English text with several standard readability formulas and prints a full letter, word, sentence, and syllable analysis.
 
-Enter a sentence or paragraph. The program counts letters, words, and sentences, then prints a grade level such as `Grade 5`, `Before Grade 1`, or `Grade 16+`.
+Enter a sentence or paragraph. The program reports counts, averages, and five indexes used to estimate how hard the text is to read.
 
-## Formula
+## Indexes
 
-```
-index = 0.0588 * L - 0.296 * S - 15.8
-```
+| Index | Formula | What it reports |
+|-------|---------|-----------------|
+| **Flesch Reading Ease** | `206.835 − 1.015 × ASL − 84.6 × ASW` | 0–100 score (higher is easier) |
+| **Flesch–Kincaid Grade Level** | `0.39 × ASL + 11.8 × ASW − 15.59` | U.S. grade level |
+| **Gunning Fog Index** | `0.4 × (ASL + 100 × complex_words / words)` | U.S. grade level |
+| **Automated Readability Index** | `4.71 × (characters / words) + 0.5 × ASL − 21.43` | U.S. grade level |
+| **Coleman–Liau Index** | `0.0588 × L − 0.296 × S − 15.8` | U.S. grade level |
 
-| Symbol | Meaning |
-|--------|---------|
-| **L** | Average number of letters per 100 words |
-| **S** | Average number of sentences per 100 words |
+Where:
 
-The index is rounded to the nearest whole number.
+- **ASL** = average sentence length (words / sentences)
+- **ASW** = average syllables per word (syllables / words)
+- **L** = average letters per 100 words
+- **S** = average sentences per 100 words
+- **Complex words** = words with 3 or more syllables
+
+### Flesch Reading Ease scale
+
+| Score | Label |
+|-------|--------|
+| 90–100 | Very Easy |
+| 80–89 | Easy |
+| 70–79 | Fairly Easy |
+| 60–69 | Standard |
+| 50–59 | Fairly Difficult |
+| 30–49 | Difficult |
+| Below 30 | Very Difficult |
+
+Grade-style indexes are also mapped as `Before Grade 1`, `Grade 1`–`Grade 15`, or `Grade 16+`.
 
 ## How text is counted
 
 | Item | Rule |
 |------|------|
-| **Letters** | Any alphabetic character (`a–z`, `A–Z`) |
-| **Words** | Sequences of characters separated by spaces |
-| **Sentences** | End with `.`, `!`, or `?` |
+| **Letters** | Alphabetic characters (`a–z`, `A–Z`) |
+| **Characters** | Letters and digits (used by ARI) |
+| **Words** | Runs of letters, digits, or apostrophes; extra spaces and punctuation are ignored |
+| **Sentences** | End with `.`, `!`, or `?`; `What?!` counts as one sentence |
+| **Syllables** | Vowel groups, with silent `e` and `-le` endings handled by a heuristic |
+| **Complex words** | Words with 3 or more syllables |
 
-## Output
+If the text has words but no sentence punctuation, it is treated as one sentence. Empty input is rejected.
 
-| Index | Printed result |
-|-------|----------------|
-| Less than 1 | `Before Grade 1` |
-| 1 through 15 | `Grade X` |
-| 16 or higher | `Grade 16+` |
+Syllable counts are heuristic, so results can differ slightly from published scores that use a dictionary.
 
 ## Requirements
 
@@ -64,28 +82,41 @@ On Windows:
 
 When prompted, type a line of text and press Enter.
 
-## Examples
+## Example
 
 ```
 Text: Congratulations! Today is your day. You're off to Great Places! You're off and away!
-Grade 3
-```
 
-```
-Text: Harry Potter was a highly unusual boy in many ways.
-Grade 5
-```
+==================================================
+  READABILITY REPORT
+==================================================
 
-```
-Text: Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, "and what is the use of a book," thought Alice, "without pictures or conversation?"
-Grade 8
+  TEXT STATISTICS
+  ---------------
+  Letters                 : ...
+  Characters (alnum)      : ...
+  Words                   : ...
+  Sentences               : ...
+  Syllables               : ...
+  Complex words (3+ syl.) : ...
+  Avg. words / sentence   : ...
+  Avg. syllables / word   : ...
+
+  INDEXES
+  -------
+  Flesch Reading Ease           : ...  (Fairly Easy)
+  Flesch-Kincaid Grade Level    : ...  (Grade ...)
+  Gunning Fog Index             : ...  (Grade ...)
+  Automated Readability Index   : ...  (Grade ...)
+  Coleman-Liau Index            : ...  (Grade 3)
+==================================================
 ```
 
 ## Project layout
 
 ```
 .
-├── readability.cpp   # Source program (uses std::string)
+├── readability.cpp   # Analyzer and all five indexes
 └── README.md
 ```
 
